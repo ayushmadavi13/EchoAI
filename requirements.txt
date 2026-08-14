@@ -25,3 +25,10 @@ python-dotenv>=1.0.0
 
 # Evaluation & Testing
 pytest>=7.4.0
+arize-phoenix>=4.0.0
+openinference-instrumentation-groq
+
+# LLM & Fast Embeddings
+groq>=0.9.0
+fastembed>=0.3.0
+sarvamai
