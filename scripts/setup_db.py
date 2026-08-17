@@ -10,14 +10,13 @@ from backend.services.embeddings import get_embeddings_batch
 from backend.services.vector_db import insert_chunks
 
 def main():
-    print("Connecting to MSMARCO dataset (Streaming mode)...")
-    # Stream the dataset to avoid downloading the 56GB block upfront
-    dataset = load_dataset("ai4bharat/MSMARCO-XI", streaming=True)
-    split_name = list(dataset.keys())[0]
+    print("Connecting to MSMARCO dataset (Downloading first 100k rows)...")
+    # We remove streaming=True to bypass a known PyArrow bug with nested chunked arrays.
+    # By specifying the split as "train[:100000]", HuggingFace is smart enough to 
+    # ONLY download the first few parquet shards (a few hundred MBs) instead of the full 56GB!
+    dataset_slice = load_dataset("ai4bharat/MSMARCO-XI", split="train[:100000]")
     
-    # We will process 10,000 rows as a solid proof of concept.
-    # You can increase this to 50k or more when you run the final build overnight.
-    TARGET_ROWS = 10000
+    TARGET_ROWS = 100000
     BATCH_SIZE = 256 # Number of chunks to embed and insert at once
     
     row_count = 0
@@ -27,7 +26,7 @@ def main():
     
     print(f"Starting advanced chunking and embedding for the first {TARGET_ROWS} rows...")
     
-    for row in dataset[split_name]:
+    for row in dataset_slice:
         if row_count >= TARGET_ROWS:
             break
             
