@@ -32,7 +32,7 @@ export default function VoiceInterface() {
   return (
     <section id="voice-interface" className="relative py-24 border-y border-white/10 overflow-hidden">
       <div className="max-w-4xl mx-auto px-6 relative z-10">
-        
+
         {/* Title */}
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 flex items-center justify-center gap-2 text-white">
@@ -46,13 +46,13 @@ export default function VoiceInterface() {
         {/* Interface Card */}
         <div className="glass-panel p-8 mb-8">
           <div className="flex flex-col items-center justify-center py-6">
-            
+
             {/* Microphone Button Container */}
             <div className="relative mb-6">
               {/* Outer Glass Ring */}
-              <motion.div 
+              <motion.div
                 animate={{
-                  boxShadow: isRecording 
+                  boxShadow: isRecording
                     ? ['0 0 20px rgba(255,255,255,0.06)', '0 0 35px rgba(255,255,255,0.25)', '0 0 20px rgba(255,255,255,0.06)']
                     : '0 0 20px rgba(255,255,255,0.06)'
                 }}
@@ -68,9 +68,7 @@ export default function VoiceInterface() {
                   whileTap={{ scale: isLoading ? 1 : 0.95 }}
                   onClick={isRecording ? stopRecording : startRecording}
                   disabled={isLoading}
-                  className={`flex items-center justify-center w-24 h-24 rounded-full transition-colors duration-300 focus:outline-none bg-black text-white hover:bg-neutral-950 ${
-                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={"flex items-center justify-center w-24 h-24 rounded-full transition-colors duration-300 focus:outline-none bg-black text-white hover:bg-neutral-950 " + (isLoading ? 'opacity-50 cursor-not-allowed' : '')}
                 >
                   {isRecording ? <MicOff className="w-10 h-10 text-white" /> : <Mic className="w-10 h-10 text-white" />}
                 </motion.button>
@@ -138,7 +136,7 @@ export default function VoiceInterface() {
 
         {/* Error Message */}
         {error && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="p-4 mb-6 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm flex gap-3 items-center"
@@ -151,68 +149,64 @@ export default function VoiceInterface() {
         {/* Results area */}
         <AnimatePresence mode="wait">
           {(transcript || isLoading) && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4 }}
               className="space-y-6"
             >
-              
+
               {/* Step list / Status Indicators */}
               <div className="glass-panel p-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${
-                    pipelineSteps.stt === 'loading' ? 'bg-white animate-ping' :
-                    pipelineSteps.stt === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
-                  }`}></div>
+                  <div className={`w-3 h-3 rounded-full ${pipelineSteps.stt === 'loading' ? 'bg-white animate-ping' :
+                      pipelineSteps.stt === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
+                    }`}></div>
                   <div className="text-left">
                     <span className="block text-xs text-[#A0A0A0]">1. Speech-to-Text</span>
                     <span className="text-xs font-semibold text-white">
                       {pipelineSteps.stt === 'loading' ? 'Transcribing...' :
-                       pipelineSteps.stt === 'success' ? 'Completed' : 'Pending'}
+                        pipelineSteps.stt === 'success' ? 'Completed' : 'Pending'}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${
-                    pipelineSteps.embedding === 'loading' ? 'bg-white animate-ping' :
-                    pipelineSteps.embedding === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
-                  }`}></div>
+                  <div className={`w-3 h-3 rounded-full ${pipelineSteps.embedding === 'loading' ? 'bg-white animate-ping' :
+                      pipelineSteps.embedding === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
+                    }`}></div>
                   <div className="text-left">
                     <span className="block text-xs text-[#A0A0A0]">2. Vector Embedding</span>
                     <span className="text-xs font-semibold text-white">
                       {pipelineSteps.embedding === 'loading' ? 'Embedding...' :
-                       pipelineSteps.embedding === 'success' ? 'Completed' : 'Pending'}
+                        pipelineSteps.embedding === 'success' ? 'Completed' : 'Pending'}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${
-                    pipelineSteps.retrieval === 'loading' ? 'bg-white animate-ping' :
-                    pipelineSteps.retrieval === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
-                  }`}></div>
+                  <div className={`w-3 h-3 rounded-full ${pipelineSteps.retrieval === 'loading' ? 'bg-white animate-ping' :
+                      pipelineSteps.retrieval === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
+                    }`}></div>
                   <div className="text-left">
                     <span className="block text-xs text-[#A0A0A0]">3. Qdrant Search</span>
                     <span className="text-xs font-semibold text-white">
                       {pipelineSteps.retrieval === 'loading' ? 'Searching...' :
-                       pipelineSteps.retrieval === 'success' ? 'Completed' : 'Pending'}
+                        pipelineSteps.retrieval === 'success' ? 'Completed' : 'Pending'}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${
-                    pipelineSteps.generation === 'loading' ? 'bg-white animate-ping' :
-                    pipelineSteps.generation === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
-                  }`}></div>
+                  <div className={`w-3 h-3 rounded-full ${pipelineSteps.generation === 'loading' ? 'bg-white animate-ping' :
+                      pipelineSteps.generation === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
+                    }`}></div>
                   <div className="text-left">
                     <span className="block text-xs text-[#A0A0A0]">4. LLM Response</span>
                     <span className="text-xs font-semibold text-white">
                       {pipelineSteps.generation === 'loading' ? 'Generating...' :
-                       pipelineSteps.generation === 'success' ? 'Completed' : 'Pending'}
+                        pipelineSteps.generation === 'success' ? 'Completed' : 'Pending'}
                     </span>
                   </div>
                 </div>
@@ -220,7 +214,7 @@ export default function VoiceInterface() {
 
               {/* Transcript Card */}
               {transcript && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="glass-panel p-6"
@@ -232,7 +226,7 @@ export default function VoiceInterface() {
 
               {/* Answer Display */}
               {answer && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="glass-panel p-6 border-white/15 bg-white/[0.02]"
@@ -247,7 +241,7 @@ export default function VoiceInterface() {
                       </span>
                     )}
                   </div>
-                  
+
                   {guardrailStatus?.blocked ? (
                     <div className="flex items-start gap-3 p-4 rounded-xl bg-[#D99A24]/10 border border-[#D99A24]/20 text-slate-300">
                       <AlertTriangle className="w-5 h-5 text-[#D99A24] flex-shrink-0 mt-0.5" />
@@ -264,7 +258,7 @@ export default function VoiceInterface() {
 
               {/* Retrieved Context Cards */}
               {contexts && contexts.length > 0 && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="glass-panel p-6"

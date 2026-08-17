@@ -6,13 +6,13 @@ from openinference.instrumentation.groq import GroqInstrumentor
 from phoenix.otel import register
 
 # Initialize Phoenix Tracer for LLM Observability
-tracer_provider = register(
-    project_name="echoai-rag", 
-    endpoint="http://localhost:6006/v1/traces"
-)
+# tracer_provider = register(
+#     project_name="echoai-rag", 
+#     endpoint="http://localhost:6006/v1/traces"
+# )
 
 # Instrument the Groq SDK globally
-GroqInstrumentor().instrument(tracer_provider=tracer_provider)
+# GroqInstrumentor().instrument(tracer_provider=tracer_provider)
 
 # Initialize Groq client
 client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
