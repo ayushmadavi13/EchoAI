@@ -50,5 +50,10 @@ Thumbs.db
 # Local Vector DB
 qdrant_data/
 
-#Task
-task2_requirements.md
+#MD file
+DEPLOYMENT.md
+
+
+#Local Benchmarks
+benchmark_results.csv
+benchmark.py
