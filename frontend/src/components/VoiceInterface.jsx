@@ -74,7 +74,7 @@ export default function VoiceInterface() {
                 >
                   {isRecording ? <MicOff className="w-10 h-10 text-white" /> : <Mic className="w-10 h-10 text-white" />}
                 </motion.button>
-              </div >
+              </motion.div>
             </div>
 
             {/* Timer and Status text */}
@@ -149,7 +149,6 @@ export default function VoiceInterface() {
         )}
 
         {/* Results area */}
-<<<<<<< HEAD
         <AnimatePresence mode="wait">
           {(transcript || isLoading) && (
             <motion.div 
@@ -172,88 +171,6 @@ export default function VoiceInterface() {
                     <span className="text-xs font-semibold text-white">
                       {pipelineSteps.stt === 'loading' ? 'Transcribing...' :
                        pipelineSteps.stt === 'success' ? 'Completed' : 'Pending'}
-=======
-        {(transcript || answer || error || isLoading) && (
-          <div className="space-y-6">
-            
-            {/* Step list / Status Indicators */}
-            <div className="glass-panel p-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  pipelineSteps.stt === 'loading' ? 'bg-white animate-ping' :
-                  pipelineSteps.stt === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
-                }`}></div>
-                <div className="text-left">
-                  <span className="block text-xs text-[#A0A0A0]">1. Speech-to-Text</span>
-                  <span className="text-xs font-semibold text-white">
-                    {pipelineSteps.stt === 'loading' ? 'Transcribing...' :
-                     pipelineSteps.stt === 'success' ? 'Completed' : 'Pending'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  pipelineSteps.embedding === 'loading' ? 'bg-white animate-ping' :
-                  pipelineSteps.embedding === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
-                }`}></div>
-                <div className="text-left">
-                  <span className="block text-xs text-[#A0A0A0]">2. Vector Embedding</span>
-                  <span className="text-xs font-semibold text-white">
-                    {pipelineSteps.embedding === 'loading' ? 'Embedding...' :
-                     pipelineSteps.embedding === 'success' ? 'Completed' : 'Pending'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  pipelineSteps.retrieval === 'loading' ? 'bg-white animate-ping' :
-                  pipelineSteps.retrieval === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
-                }`}></div>
-                <div className="text-left">
-                  <span className="block text-xs text-[#A0A0A0]">3. Qdrant Search</span>
-                  <span className="text-xs font-semibold text-white">
-                    {pipelineSteps.retrieval === 'loading' ? 'Searching...' :
-                     pipelineSteps.retrieval === 'success' ? 'Completed' : 'Pending'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  pipelineSteps.generation === 'loading' ? 'bg-white animate-ping' :
-                  pipelineSteps.generation === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
-                }`}></div>
-                <div className="text-left">
-                  <span className="block text-xs text-[#A0A0A0]">4. LLM Response</span>
-                  <span className="text-xs font-semibold text-white">
-                    {pipelineSteps.generation === 'loading' ? 'Generating...' :
-                     pipelineSteps.generation === 'success' ? 'Completed' : 'Pending'}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Transcript Card */}
-            {transcript && (
-              <div className="glass-panel p-6">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-[#A0A0A0] mb-2">Transcribed Query</h3>
-                <p className="text-white text-lg font-medium">"{transcript}"</p>
-              </div>
-            )}
-
-            {/* Answer Display */}
-            {answer && (
-              <div className="glass-panel p-6 border-white/15 bg-white/[0.02]">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
-                  <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-white" /> Generated Answer
-                  </h3>
-                  {latencies && (
-                    <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[#5BE17C]/15 border border-[#5BE17C]/25 text-[#5BE17C]">
-                      Total Latency: {latencies.total_ms.toFixed(1)}ms
->>>>>>> 1a950d4550e2f92ccbb9e62bfc07b9cccc28d9d2
                     </span>
                   </div>
                 </div>
