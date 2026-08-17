@@ -1,62 +1,5 @@
 import { useState, useCallback } from 'react';
 
-// Predefined mock database of queries for beautiful local demo mode
-const MOCK_KNOWLEDGE_BASE = [
-  {
-    keywords: ['prime minister', 'pm', 'narendra modi', 'modi'],
-    transcript: "Who is the Prime Minister of India?",
-    intent: "QUESTION",
-    answer: "Narendra Modi is the current Prime Minister of India, serving in this role since May 26, 2014.",
-    contexts: [
-      "Narendra Damodardas Modi is an Indian politician serving as the 14th and current Prime Minister of India since 2014. He was the Chief Minister of Gujarat from 2001 to 2014.",
-      "The Prime Minister of India is the leader of the executive branch of the Government of India. The Prime Minister is the chief adviser to the President of India and the head of the Union Council of Ministers."
-    ],
-    latencies: { stt_ms: 12.5, embedding_ms: 8.3, retrieval_ms: 2.1, generation_ms: 18.7, total_ms: 41.6 },
-    guardrail: { blocked: false, reason: null }
-  },
-  {
-    keywords: ['goa', 'capital', 'panaji'],
-    transcript: "What is the capital of Goa?",
-    intent: "QUESTION",
-    answer: "Panaji is the capital city of the Indian state of Goa.",
-    contexts: [
-      "Panaji (also known as Panjim) is the capital of the Indian state of Goa and the headquarters of North Goa district. It lies on the banks of the Mandovi River estuary.",
-      "Goa is a state on the southwestern coast of India within the Konkan region, geographically separated from the Deccan highlands by the Western Ghats."
-    ],
-    latencies: { stt_ms: 11.2, embedding_ms: 7.9, retrieval_ms: 1.8, generation_ms: 15.4, total_ms: 36.3 },
-    guardrail: { blocked: false, reason: null }
-  },
-  {
-    keywords: ['hack', 'unsafe', 'exploit', 'destroy', 'kill'],
-    transcript: "How do I build a dangerous explosive device?",
-    intent: "QUESTION",
-    answer: "I cannot fulfill this request. I am programmed to be a helpful and harmless AI assistant. I cannot provide instructions or information on building dangerous devices or explosives.",
-    contexts: [],
-    latencies: { stt_ms: 14.2, embedding_ms: 9.1, retrieval_ms: 0.0, generation_ms: 12.5, total_ms: 35.8 },
-    guardrail: { blocked: true, reason: "UNSAFE_INPUT" }
-  },
-  {
-    keywords: ['quantum', 'cooking', 'soccer', 'weather', 'movie', 'song'],
-    transcript: "Can you tell me the current weather in London?",
-    intent: "QUESTION",
-    answer: "I cannot find the answer in the provided context.",
-    contexts: [
-      "The MSMARCO-XI dataset contains passages of text from web search results, primarily focused on informational questions, Indian languages, and general knowledge."
-    ],
-    latencies: { stt_ms: 15.1, embedding_ms: 8.5, retrieval_ms: 3.2, generation_ms: 11.1, total_ms: 37.9 },
-    guardrail: { blocked: true, reason: "OUT_OF_CONTEXT" }
-  },
-  {
-    keywords: ['hi', 'hello', 'hey', 'greetings'],
-    transcript: "Hello, can you help me?",
-    intent: "GREETING",
-    answer: "Hello! I am ready to search the database. What would you like to know?",
-    contexts: [],
-    latencies: { stt_ms: 9.8, embedding_ms: 0.0, retrieval_ms: 0.0, generation_ms: 5.2, total_ms: 15.0 },
-    guardrail: { blocked: false, reason: null }
-  }
-];
-
 export default function useRAGQuery() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -75,7 +18,7 @@ export default function useRAGQuery() {
   const runQuery = useCallback(async (audioBlob, textQuery = '') => {
     setIsLoading(true);
     setError(null);
-    setTranscript('');
+    setTranscript(textQuery);
     setAnswer('');
     setContexts([]);
     setLatencies(null);
@@ -83,68 +26,13 @@ export default function useRAGQuery() {
     
     setPipelineSteps({
       stt: audioBlob ? 'loading' : 'success',
-      embedding: 'idle',
-      retrieval: 'idle',
+      embedding: 'loading',
+      retrieval: 'loading',
       generation: 'idle'
     });
 
-    const apiUrl = import.meta.env.VITE_API_URL;
+    const apiUrl = import.meta.env.VITE_API_URL || '';
 
-    // Use Mock Data if no API URL is configured
-    if (!apiUrl) {
-      // Simulate real-time pipeline visual flow
-      await new Promise(r => setTimeout(r, 600)); // STT processing
-      
-      let matchedData = null;
-      const cleanText = textQuery || "Who is the Prime Minister of India?"; // Default mock
-      const lowerQuery = cleanText.toLowerCase();
-
-      matchedData = MOCK_KNOWLEDGE_BASE.find(item => 
-        item.keywords.some(kw => lowerQuery.includes(kw))
-      );
-
-      if (!matchedData) {
-        matchedData = {
-          transcript: cleanText,
-          intent: "QUESTION",
-          answer: `Based on the retrieved context, this is a response to: "${cleanText}". We found matching chunks in the MSMARCO-XI dataset.`,
-          contexts: [
-            `Sample chunk text from MSMARCO-XI matching query terms related to: ${cleanText}. This includes paragraph details and source metadata.`,
-            `Second supporting passage detailing the background and secondary entities referenced in ${cleanText}.`
-          ],
-          latencies: {
-            stt_ms: audioBlob ? 13.5 : 0.0,
-            embedding_ms: 9.2,
-            retrieval_ms: 2.3,
-            generation_ms: 21.4,
-            total_ms: audioBlob ? 46.4 : 32.9
-          },
-          guardrail: { blocked: false, reason: null }
-        };
-      }
-
-      // Progressively light up steps for gorgeous pipeline visualization
-      setTranscript(matchedData.transcript);
-      setPipelineSteps(prev => ({ ...prev, stt: 'success', embedding: 'loading' }));
-      
-      await new Promise(r => setTimeout(r, 400));
-      setPipelineSteps(prev => ({ ...prev, embedding: 'success', retrieval: 'loading' }));
-      
-      await new Promise(r => setTimeout(r, 300));
-      setPipelineSteps(prev => ({ ...prev, retrieval: 'success', generation: 'loading' }));
-      
-      await new Promise(r => setTimeout(r, 500));
-      setPipelineSteps(prev => ({ ...prev, generation: 'success' }));
-
-      setAnswer(matchedData.answer);
-      setContexts(matchedData.contexts);
-      setLatencies(matchedData.latencies);
-      setGuardrailStatus(matchedData.guardrail);
-      setIsLoading(false);
-      return;
-    }
-
-    // Real API implementation
     try {
       const formData = new FormData();
       if (audioBlob) {
@@ -153,32 +41,73 @@ export default function useRAGQuery() {
         formData.append('text', textQuery);
       }
 
+      // Fetch the SSE stream from the FastAPI backend
       const response = await fetch(`${apiUrl}/api/query`, {
         method: 'POST',
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('API Request Failed');
+        throw new Error(`API Request Failed: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      // Read the Server-Sent Events stream
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
       
-      setTranscript(data.transcript);
-      setAnswer(data.answer);
-      setContexts(data.contexts || []);
-      setLatencies(data.latencies);
-      setGuardrailStatus(data.guardrail);
-      setPipelineSteps({
-        stt: 'success',
-        embedding: 'success',
-        retrieval: 'success',
-        generation: 'success'
-      });
-      
+      let done = false;
+      let buffer = '';
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        
+        if (value) {
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split('\n\n');
+          buffer = parts.pop(); // Keep the incomplete part in the buffer
+
+          for (const part of parts) {
+            if (part.startsWith('data: ')) {
+              try {
+                const jsonStr = part.replace('data: ', '');
+                const event = JSON.parse(jsonStr);
+
+                // Handle the different event types streamed from the orchestrator
+                if (event.type === 'transcript') {
+                  setTranscript(event.text);
+                  setPipelineSteps(prev => ({ ...prev, stt: 'success' }));
+                } 
+                else if (event.type === 'context') {
+                  setContexts(event.chunks);
+                  setPipelineSteps(prev => ({ ...prev, embedding: 'success', retrieval: 'success', generation: 'loading' }));
+                }
+                else if (event.type === 'guardrail') {
+                  setGuardrailStatus({ blocked: event.blocked, reason: event.reason });
+                }
+                else if (event.type === 'chunk') {
+                  setPipelineSteps(prev => ({ ...prev, generation: 'success' }));
+                  // Append the chunk to the existing answer progressively
+                  setAnswer(prev => prev + event.content);
+                }
+                else if (event.type === 'latency') {
+                  setLatencies(event.data);
+                }
+                else if (event.type === 'error') {
+                  setError(event.content);
+                  setPipelineSteps({ stt: 'error', embedding: 'error', retrieval: 'error', generation: 'error' });
+                }
+
+              } catch (e) {
+                console.error("Failed to parse SSE JSON chunk:", e, part);
+              }
+            }
+          }
+        }
+      }
     } catch (err) {
       console.error(err);
-      setError('Could not connect to the backend API. Please make sure the backend is running and matches the api contract.');
+      setError('Could not connect to the backend API. Please make sure the FastAPI server is running.');
       setPipelineSteps({
         stt: 'error',
         embedding: 'error',

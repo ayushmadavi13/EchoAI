@@ -1,21 +1,37 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, File, UploadFile, Form
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
 from backend.agents.orchestrator import RagOrchestrator
+from backend.services.stt import transcribe_audio
 
 router = APIRouter()
 orchestrator = RagOrchestrator(max_retries=2)
 
-class QueryRequest(BaseModel):
-    query: str
-
-@router.post("/ask")
-async def ask_question(request: QueryRequest):
+@router.post("/query")
+async def ask_question(
+    audio: UploadFile = File(None),
+    text: str = Form(None)
+):
     """
-    Endpoint that receives a query and streams the RAG response back.
-    Streaming ensures Time-To-First-Token (TTFT) stays under 50ms.
+    Endpoint that receives either an audio file OR text query.
+    Returns a Server-Sent Events (SSE) stream of JSON objects containing 
+    metadata (STT, Contexts, Latencies) and generated text chunks.
     """
+    transcript = ""
+    query = ""
+    
+    if audio:
+        audio_bytes = await audio.read()
+        filename = audio.filename
+        query = await transcribe_audio(audio_bytes, filename)
+        transcript = query
+    elif text:
+        query = text
+        
+    if not query:
+        # Fallback if somehow both are missing or STT fails entirely
+        query = "Hello"
+        
     return StreamingResponse(
-        orchestrator.process(request.query), 
-        media_type="text/plain"
+        orchestrator.process(query, transcript), 
+        media_type="text/event-stream"
     )
