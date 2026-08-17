@@ -32,14 +32,58 @@ async def generate_answer_stream(query: str, context: str) -> AsyncGenerator[str
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"Context:\n{context}\n\nQuestion:\n{query}"}
         ],
-        model="llama-3.1-8b-instant",
+        model="qwen/qwen3.6-27b",
         temperature=0.0,
         stream=True,
     )
     
+    in_thought = False
+    buffer = ""
+    
     async for chunk in stream:
-        if chunk.choices[0].delta.content:
-            yield chunk.choices[0].delta.content
+        text = chunk.choices[0].delta.content
+        if text:
+            buffer += text
+            
+            while True:
+                if not in_thought:
+                    start_idx = buffer.find("<think>")
+                    if start_idx != -1:
+                        # Yield everything before <think>
+                        if start_idx > 0:
+                            yield buffer[:start_idx]
+                        buffer = buffer[start_idx + len("<think>"):]
+                        in_thought = True
+                    else:
+                        # Check if buffer ends with a partial "<think>"
+                        idx = buffer.rfind("<")
+                        if idx != -1 and "<think>".startswith(buffer[idx:]):
+                            # Yield everything up to the partial "<"
+                            if idx > 0:
+                                yield buffer[:idx]
+                            buffer = buffer[idx:]
+                        else:
+                            # No partial match, yield the whole buffer
+                            yield buffer
+                            buffer = ""
+                        break
+                else:
+                    end_idx = buffer.find("</think>")
+                    if end_idx != -1:
+                        buffer = buffer[end_idx + len("</think>"):]
+                        in_thought = False
+                    else:
+                        # Discard thought tokens but keep a partial "</think>"
+                        idx = buffer.rfind("<")
+                        if idx != -1 and "</think>".startswith(buffer[idx:]):
+                            buffer = buffer[idx:]
+                        else:
+                            buffer = "" 
+                        break
+
+    if buffer and not in_thought:
+        # Clean up any leftover newlines at the very beginning of the final output
+        yield buffer.lstrip('\n')
 
 async def classify_query_intent(query: str) -> Dict[str, Any]:
     """
@@ -59,7 +103,7 @@ async def classify_query_intent(query: str) -> Dict[str, Any]:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": query}
         ],
-        model="llama-3.1-8b-instant",
+        model="qwen/qwen3.6-27b",
         temperature=0.0,
         response_format={"type": "json_object"},
     )

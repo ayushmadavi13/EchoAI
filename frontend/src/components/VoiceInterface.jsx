@@ -131,7 +131,7 @@ export default function VoiceInterface() {
         )}
 
         {/* Results area */}
-        {(transcript || isLoading) && (
+        {(transcript || answer || error || isLoading) && (
           <div className="space-y-6">
             
             {/* Step list / Status Indicators */}
