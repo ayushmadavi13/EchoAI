@@ -61,8 +61,9 @@ export default function Starfield() {
           size,
           color,
           alpha: Math.random() * 0.8 + 0.2,
-          twinkleSpeed: 0.005 + Math.random() * 0.015,
-          twinkleDir: Math.random() > 0.5 ? 1 : -1
+          twinkleSpeed: 0.003 + Math.random() * 0.007,
+          twinkleDir: Math.random() > 0.5 ? 1 : -1,
+          speedY: (size * 0.04) + 0.01 // Parallax speed based on size
         });
       }
     };
@@ -80,6 +81,13 @@ export default function Starfield() {
         } else if (star.alpha <= 0.1) {
           star.alpha = 0.1;
           star.twinkleDir = 1;
+        }
+
+        // Extremely slow drifting space movement (downward)
+        star.y += star.speedY;
+        if (star.y > canvas.height) {
+          star.y = 0;
+          star.x = Math.random() * canvas.width;
         }
 
         ctx.beginPath();

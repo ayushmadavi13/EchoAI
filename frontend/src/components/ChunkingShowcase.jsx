@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Layers, Scissors, Columns, Hash } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CHUNKING_STRATEGIES = [
   {
@@ -34,34 +35,52 @@ export default function ChunkingShowcase() {
     switch(activeStrategy) {
       case "semantic":
         return (
-          <div className="space-y-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-4"
+          >
             <div className="p-3 rounded bg-white/5 border border-white/10 text-xs text-[#A0A0A0] font-mono">
               <span className="text-white font-semibold">[Chunk #1]</span> Goa is a state on the southwestern coast of India within the Konkan region. It is geographically separated from the Deccan highlands by the Western Ghats.
             </div>
             <div className="p-3 rounded bg-white/5 border border-white/10 text-xs text-[#A0A0A0] font-mono">
               <span className="text-white font-semibold">[Chunk #2]</span> Panaji is the capital city of Goa. The state is famous for its beaches, places of worship and world heritage architecture.
             </div>
-          </div>
+          </motion.div>
         );
       case "overlap":
         return (
-          <div className="space-y-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-4"
+          >
             <div className="p-3 rounded bg-white/5 border border-white/10 text-xs text-[#A0A0A0] font-mono">
               <span className="text-white font-semibold">[Chunk #1]</span> Goa is a state on the southwestern coast of India within the Konkan region. <span className="text-white font-semibold underline underline-offset-4">It is geographically separated from the Deccan highlands by the Western Ghats.</span>
             </div>
             <div className="p-3 rounded bg-white/5 border border-white/10 text-xs text-[#A0A0A0] font-mono">
               <span className="text-white font-semibold">[Chunk #2]</span> <span className="text-white font-semibold underline underline-offset-4">It is geographically separated from the Deccan highlands by the Western Ghats.</span> Panaji is the capital city of Goa.
             </div>
-          </div>
+          </motion.div>
         );
       case "metadata":
         return (
-          <div className="space-y-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-4"
+          >
             <div className="p-3 rounded bg-white/5 border border-white/10 text-xs text-[#A0A0A0] font-mono">
               <span className="text-white font-bold block mb-1">Prefix: [Source: MSMARCO-XI | Language: English | Query: capital city of Goa]</span>
               Panaji is the capital city of Goa. The state is famous for its beaches...
             </div>
-          </div>
+          </motion.div>
         );
       default:
         return null;
@@ -89,8 +108,10 @@ export default function ChunkingShowcase() {
             {CHUNKING_STRATEGIES.map((strat) => {
               const Icon = strat.icon;
               return (
-                <button
+                <motion.button
                   key={strat.id}
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setActiveStrategy(strat.id)}
                   className={`w-full text-left p-5 rounded-xl border transition-all duration-300 flex gap-4 ${
                     activeStrategy === strat.id 
@@ -109,13 +130,19 @@ export default function ChunkingShowcase() {
                     </h3>
                     <p className="text-xs text-[#A0A0A0] leading-relaxed">{strat.desc}</p>
                   </div>
-                </button>
+                </motion.button>
               );
             })}
           </div>
 
           {/* Visualization Console */}
-          <div className="lg:col-span-7 glass-panel p-8 flex flex-col justify-between">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="lg:col-span-7 glass-panel p-8 flex flex-col justify-between"
+          >
             <div>
               <span className="text-[10px] font-mono font-bold tracking-widest text-white uppercase bg-white/10 px-2 py-0.5 rounded border border-white/15">
                 Visual Simulator
@@ -132,18 +159,29 @@ export default function ChunkingShowcase() {
               {/* Visualization output */}
               <div>
                 <h4 className="text-xs font-semibold text-[#A0A0A0] uppercase mb-2">Resulting Vector Chunks</h4>
-                {renderChunkVisualization()}
+                <AnimatePresence mode="wait">
+                  {renderChunkVisualization()}
+                </AnimatePresence>
               </div>
             </div>
 
             {/* Strategy Benefit Box */}
             <div className="border-t border-white/10 pt-6 mt-8">
               <span className="text-xs text-[#A0A0A0] block mb-1">Retrieval Benefit</span>
-              <p className="text-sm text-white font-medium">
-                {CHUNKING_STRATEGIES.find(s => s.id === activeStrategy)?.benefit}
-              </p>
+              <AnimatePresence mode="wait">
+                <motion.p 
+                  key={activeStrategy}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-sm text-white font-medium"
+                >
+                  {CHUNKING_STRATEGIES.find(s => s.id === activeStrategy)?.benefit}
+                </motion.p>
+              </AnimatePresence>
             </div>
-          </div>
+          </motion.div>
 
         </div>
 

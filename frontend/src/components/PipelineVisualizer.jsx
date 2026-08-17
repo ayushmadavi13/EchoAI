@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mic, Speech, Cpu, Database, ShieldAlert, Sparkles, Binary } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const STEPS = [
   {
@@ -41,6 +42,24 @@ const STEPS = [
 ];
 
 export default function PipelineVisualizer() {
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
+    }
+  };
+
   return (
     <section id="pipeline-visualizer" className="relative py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -56,7 +75,13 @@ export default function PipelineVisualizer() {
         </div>
 
         {/* Pipeline Diagram Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 relative">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 relative"
+        >
           
           {/* Connector Line Background */}
           <div className="hidden lg:block absolute top-1/2 left-4 right-4 h-0.5 bg-white/10 -translate-y-1/2 -z-10"></div>
@@ -64,9 +89,11 @@ export default function PipelineVisualizer() {
           {STEPS.map((step, idx) => {
             const Icon = step.icon;
             return (
-              <div 
+              <motion.div 
                 key={idx} 
-                className="glass-panel p-6 flex flex-col items-center text-center relative hover:-translate-y-1 duration-300"
+                variants={cardVariants}
+                whileHover={{ y: -5, borderColor: 'rgba(255,255,255,0.2)' }}
+                className="glass-panel p-6 flex flex-col items-center text-center relative duration-300"
               >
                 {/* Index Counter */}
                 <div className="absolute top-3 left-3 font-mono text-xs font-bold text-slate-500">
@@ -86,17 +113,23 @@ export default function PipelineVisualizer() {
                 <span className="mt-auto px-2 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-[10px] text-[#A0A0A0]">
                   {step.tech}
                 </span>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Bottom stats callout */}
-        <div className="mt-12 glass-panel p-6 border-white/10 bg-white/[0.01] text-center max-w-2xl mx-auto">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="mt-12 glass-panel p-6 border-white/10 bg-white/[0.01] text-center max-w-2xl mx-auto"
+        >
           <p className="text-sm text-slate-300">
             💡 <span className="font-semibold text-white">Engineering Note:</span> Running FastEmbed and Qdrant locally avoids network roundtrips, allowing the retrieval + database layer to execute in <span className="text-white font-bold">&lt;10ms</span>.
           </p>
-        </div>
+        </motion.div>
 
       </div>
     </section>
