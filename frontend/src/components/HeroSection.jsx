@@ -61,7 +61,7 @@ export default function HeroSection() {
         {/* CTA Buttons */}
         <motion.div 
           variants={itemVariants}
-          className="flex flex-col sm:flex-row gap-4 mb-16"
+          className="flex justify-center mb-16"
         >
           <a 
             href="#voice-interface" 
@@ -69,12 +69,6 @@ export default function HeroSection() {
           >
             Start Voice Query 
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </a>
-          <a 
-            href="#pipeline-visualizer" 
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold text-base backdrop-blur-md transition-all duration-300"
-          >
-            View System Architecture
           </a>
         </motion.div>
 

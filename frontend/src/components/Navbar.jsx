@@ -3,6 +3,7 @@ import { Mic, Github, Cpu } from 'lucide-react';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isOnline, setIsOnline] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -10,6 +11,42 @@ export default function Navbar() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const checkHealth = async () => {
+      const envUrl = import.meta.env.VITE_API_URL || '';
+      const urlsToTry = envUrl 
+        ? [`${envUrl}/health`, `${envUrl}/api/health`]
+        : ['/health', '/api/health', 'http://127.0.0.1:8000/health', 'http://localhost:8000/health'];
+
+      for (const url of urlsToTry) {
+        try {
+          const res = await fetch(url, { 
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+          });
+          
+          if (res.ok) {
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+              const data = await res.json();
+              if (data && data.status === 'healthy') {
+                setIsOnline(true);
+                return;
+              }
+            }
+          }
+        } catch {
+          // Ignore fetch error and check next URL
+        }
+      }
+      setIsOnline(false);
+    };
+
+    checkHealth();
+    const interval = setInterval(checkHealth, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -30,12 +67,10 @@ export default function Navbar() {
         </a>
 
         {/* Navigation Links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           <a href="#voice-interface" className="text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors">Query</a>
           <a href="#pipeline-visualizer" className="text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors">Architecture</a>
           <a href="#latency-dashboard" className="text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors">Latency</a>
-          <a href="#chunking-showcase" className="text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors">Chunking</a>
-          <a href="#guardrails-panel" className="text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors">Safety</a>
         </div>
 
         {/* GitHub / Action Buttons */}
@@ -48,8 +83,21 @@ export default function Navbar() {
           >
             <Github className="w-5 h-5" />
           </a>
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/15 text-white text-xs font-semibold uppercase tracking-wider">
-            <Cpu className="w-3.5 h-3.5" /> Task 2 Active
+          <span className={`hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
+            isOnline === true 
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+              : isOnline === false
+              ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+              : 'bg-white/5 border-white/15 text-slate-400'
+          }`}>
+            <span className={`w-2 h-2 rounded-full ${
+              isOnline === true 
+                ? 'bg-emerald-400 animate-pulse' 
+                : isOnline === false
+                ? 'bg-rose-400'
+                : 'bg-slate-400 animate-ping'
+            }`}></span>
+            {isOnline === true ? 'Backend Online' : isOnline === false ? 'Backend Offline' : 'Checking Status'}
           </span>
         </div>
       </div>

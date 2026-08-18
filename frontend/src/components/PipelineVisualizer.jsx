@@ -118,19 +118,6 @@ export default function PipelineVisualizer() {
           })}
         </motion.div>
 
-        {/* Bottom stats callout */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="mt-12 glass-panel p-6 border-white/10 bg-white/[0.01] text-center max-w-2xl mx-auto"
-        >
-          <p className="text-sm text-slate-300">
-            💡 <span className="font-semibold text-white">Engineering Note:</span> Running FastEmbed and Qdrant locally avoids network roundtrips, allowing the retrieval + database layer to execute in <span className="text-white font-bold">&lt;10ms</span>.
-          </p>
-        </motion.div>
-
       </div>
     </section>
   );

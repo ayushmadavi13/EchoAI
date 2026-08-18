@@ -5,8 +5,7 @@ import HeroSection from './components/HeroSection';
 import VoiceInterface from './components/VoiceInterface';
 import PipelineVisualizer from './components/PipelineVisualizer';
 import LatencyDashboard from './components/LatencyDashboard';
-import ChunkingShowcase from './components/ChunkingShowcase';
-import GuardrailsPanel from './components/GuardrailsPanel';
+
 import Footer from './components/Footer';
 
 export default function App() {
@@ -25,8 +24,7 @@ export default function App() {
         <VoiceInterface />
         <PipelineVisualizer />
         <LatencyDashboard />
-        <ChunkingShowcase />
-        <GuardrailsPanel />
+
       </main>
 
       <Footer />
