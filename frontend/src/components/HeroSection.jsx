@@ -23,7 +23,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-32 pb-20 overflow-hidden">
+    <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-20 overflow-hidden">
       <motion.div 
         variants={containerVariants}
         initial="hidden"
@@ -55,7 +55,7 @@ export default function HeroSection() {
           variants={itemVariants}
           className="max-w-2xl text-lg sm:text-xl text-[#A0A0A0] mb-10 leading-relaxed"
         >
-          Ask questions using your voice and get answers grounded in relevant retrieved knowledge from the MSMARCO-XI dataset in under 50ms.
+          Ask questions using your voice and get answers grounded in relevant retrieved knowledge from the MSMARCO-XI dataset.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -65,7 +65,7 @@ export default function HeroSection() {
         >
           <a 
             href="#voice-interface" 
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-black hover:bg-slate-100 font-bold text-base transition-all duration-300 group"
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-black hover:bg-slate-100 font-bold text-base transition-all duration-300 group cursor-pointer"
           >
             Start Voice Query 
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

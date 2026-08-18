@@ -3,7 +3,7 @@ import { Mic, Github, Twitter, Linkedin } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="relative py-12 border-t border-white/10 bg-black overflow-hidden">
+    <footer className="relative py-12 border-t border-white/10 bg-transparent overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
         
         {/* Brand */}

@@ -44,7 +44,7 @@ export default function VoiceInterface() {
         </div>
 
         {/* Interface Card */}
-        <div className="glass-panel p-8 mb-8">
+        <div className="glass-panel p-5 sm:p-8 mb-8">
           <div className="flex flex-col items-center justify-center py-6">
 
             {/* Microphone Button Container */}
@@ -113,21 +113,21 @@ export default function VoiceInterface() {
           </div>
 
           {/* Form Text input fallback */}
-          <form onSubmit={handleTextSubmit} className="flex gap-3 max-w-lg mx-auto border-t border-white/10 pt-6">
+          <form onSubmit={handleTextSubmit} className="flex flex-col sm:flex-row gap-3 w-full max-w-lg mx-auto border-t border-white/10 pt-6">
             <input
               type="text"
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
               disabled={isLoading || isRecording}
               placeholder="Or type your search query here..."
-              className="flex-1 bg-white/5 border border-white/10 focus:border-white/35 rounded-xl px-4 py-3 text-white text-sm focus:outline-none placeholder-[#A0A0A0]/40 transition-colors"
+              className="flex-1 min-w-0 w-full bg-white/5 border border-white/10 focus:border-white/35 rounded-xl px-4 py-3 text-white text-sm focus:outline-none placeholder-[#A0A0A0]/40 transition-colors"
             />
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isLoading || isRecording || !textInput.trim()}
-              className="px-5 py-3 rounded-xl bg-white hover:bg-slate-100 text-black font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all"
+              className="px-6 py-3 rounded-xl bg-white hover:bg-slate-100 text-black font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all shrink-0 cursor-pointer"
             >
               Send <Send className="w-4 h-4" />
             </motion.button>
