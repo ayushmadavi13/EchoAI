@@ -28,10 +28,8 @@ def semantic_chunker(text: str, query: str, max_chars: int = 600, overlap_senten
             
             # To maximize retrieval relevance, we prepend the query to the chunk text itself
             # so the embedding captures both the question and the answer context natively
-            enriched_text = f"Query: {query}\nContext: {chunk_text}"
-            
             chunks.append({
-                "text": enriched_text,
+                "text": chunk_text,
                 "metadata": {"source_query": query, "original_text": chunk_text}
             })
             
@@ -46,9 +44,8 @@ def semantic_chunker(text: str, query: str, max_chars: int = 600, overlap_senten
     # Add any remaining sentences as the last chunk
     if current_sentences:
         chunk_text = " ".join(current_sentences)
-        enriched_text = f"Query: {query}\nContext: {chunk_text}"
         chunks.append({
-            "text": enriched_text,
+            "text": chunk_text,
             "metadata": {"source_query": query, "original_text": chunk_text}
         })
         

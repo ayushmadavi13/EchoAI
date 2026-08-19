@@ -58,3 +58,8 @@ task2_requirements.md
 #Local Benchmarks
 benchmark_results.csv
 benchmark.py
+benchmark_retrieval.py
+
+#local DB
+hindi_msmarco.jsonl
+*.parquet

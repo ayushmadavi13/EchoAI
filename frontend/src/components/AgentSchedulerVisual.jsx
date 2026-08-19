@@ -23,7 +23,7 @@ const INITIAL_BENCHMARKS = [
   { id: 10, query: "Give overview of model harness architecture.", stt: 12.3, vector: 2.1, llm: 20.2, total: 34.6, status: "Passed" },
 ];
 
-export default function AgentSchedulerVisual() {
+export default function AgentSchedulerVisual({ queryState }) {
   const [activeStep, setActiveStep] = useState(4);
   const [isSimulating, setIsSimulating] = useState(true);
   const [isRunningBenchmark, setIsRunningBenchmark] = useState(false);
@@ -34,13 +34,92 @@ export default function AgentSchedulerVisual() {
     p100: "46.4ms"
   });
 
+  const { pipelineSteps, latencies, guardrailStatus, answer, isLoading } = queryState || {};
+  
+  // Decide whether to use real data or auto simulate
+  const isRealData = pipelineSteps && Object.values(pipelineSteps).some(v => v !== 'idle');
+
+  // Override activeStep if real data is coming in
+  let displayStep = activeStep;
+  if (isRealData) {
+    if (pipelineSteps.stt === 'loading') displayStep = 0;
+    else if (pipelineSteps.embedding === 'loading') displayStep = 1;
+    else if (pipelineSteps.retrieval === 'loading') displayStep = 2; 
+    else if (pipelineSteps.generation === 'loading') displayStep = 4;
+    else if (pipelineSteps.generation === 'success') displayStep = 5;
+  }
+
+  // Generate dynamic tasks with real latencies
+  const displayTasks = TASKS.map((task, idx) => {
+    let duration = task.duration;
+    let status = 'idle'; 
+    
+    if (isRealData) {
+      if (idx === 0) {
+        status = pipelineSteps.stt;
+        if (latencies?.stt_ms) duration = `${latencies.stt_ms.toFixed(1)}ms`;
+        else if (status === 'success') duration = 'Done';
+        else if (status === 'loading') duration = '...';
+        else duration = '-';
+      }
+      if (idx === 1) {
+        status = pipelineSteps.embedding;
+        if (latencies?.embedding_ms) duration = `${latencies.embedding_ms.toFixed(1)}ms`;
+        else if (status === 'success') duration = 'Done';
+        else if (status === 'loading') duration = '...';
+        else duration = '-';
+      }
+      if (idx === 2) {
+        status = pipelineSteps.retrieval;
+        if (latencies?.retrieval_ms) duration = `${latencies.retrieval_ms.toFixed(1)}ms`;
+        else if (status === 'success') duration = 'Done';
+        else if (status === 'loading') duration = '...';
+        else duration = '-';
+      }
+      if (idx === 3) {
+        if (guardrailStatus) {
+           status = 'success';
+           duration = guardrailStatus.blocked ? 'Failed' : 'Passed';
+        } else if (pipelineSteps.retrieval === 'loading') {
+           status = 'loading';
+           duration = '...';
+        } else if (pipelineSteps.retrieval === 'success') {
+           status = 'success';
+           duration = 'Passed';
+        } else {
+           status = 'idle';
+           duration = '-';
+        }
+      }
+      if (idx === 4) {
+        status = pipelineSteps.generation;
+        if (latencies?.generation_ms) duration = `${latencies.generation_ms.toFixed(1)}ms`;
+        else if (status === 'success') duration = 'Done';
+        else if (status === 'loading') duration = '...';
+        else duration = '-';
+      }
+    }
+    return { ...task, displayDuration: duration, realStatus: status };
+  });
+
+  const totalLatencyText = isRealData && latencies?.total_ms 
+    ? `${latencies.total_ms.toFixed(1)}ms Total` 
+    : '32.4ms Total';
+
+  // Auto turn off simulation if real query starts
   useEffect(() => {
-    if (!isSimulating) return;
+    if (isRealData && isSimulating) {
+      setIsSimulating(false);
+    }
+  }, [isRealData, isSimulating]);
+
+  useEffect(() => {
+    if (!isSimulating || isRealData) return;
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev + 1) % TASKS.length);
     }, 2500);
     return () => clearInterval(interval);
-  }, [isSimulating]);
+  }, [isSimulating, isRealData]);
 
   const handleRunBenchmark = () => {
     if (isRunningBenchmark) return;
@@ -116,7 +195,7 @@ export default function AgentSchedulerVisual() {
                 </button>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] sm:text-xs font-mono font-bold">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                  32.4ms Total
+                  {totalLatencyText}
                 </span>
               </div>
             </div>
@@ -131,10 +210,11 @@ export default function AgentSchedulerVisual() {
                   <span className="text-xs font-mono text-slate-500">5 Tasks Scheduled</span>
                 </div>
 
-                {TASKS.map((task, idx) => {
+                {displayTasks.map((task, idx) => {
                   const Icon = task.icon;
-                  const isCurrent = activeStep === idx;
-                  const isDone = activeStep > idx;
+                  // If real data, use displayStep; else use activeStep
+                  const isCurrent = isRealData ? displayStep === idx : activeStep === idx;
+                  const isDone = isRealData ? (task.realStatus === 'success' || displayStep > idx) : activeStep > idx;
 
                   return (
                     <motion.div
@@ -168,7 +248,7 @@ export default function AgentSchedulerVisual() {
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <span className="text-[11px] font-mono font-semibold text-slate-400">{task.duration}</span>
+                        <span className="text-[11px] font-mono font-semibold text-slate-400">{task.displayDuration}</span>
                         {isDone ? (
                           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                         ) : isCurrent ? (
@@ -202,11 +282,11 @@ export default function AgentSchedulerVisual() {
                     <span className="text-[10px] font-mono text-slate-400 block mb-1 uppercase">Current Stage</span>
                     <p className="text-sm font-bold text-white flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-white" />
-                      {TASKS[activeStep].title}
+                      {TASKS[isRealData && displayStep < 5 ? displayStep : activeStep >= 5 ? 4 : activeStep].title}
                     </p>
                     <div className="mt-3 h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
                       <motion.div 
-                        key={activeStep}
+                        key={isRealData ? displayStep : activeStep}
                         initial={{ width: "0%" }}
                         animate={{ width: "100%" }}
                         transition={{ duration: 2.5, ease: "linear" }}
@@ -223,7 +303,9 @@ export default function AgentSchedulerVisual() {
                     </div>
                     <div className="p-3 rounded-lg bg-white/5 border border-white/5">
                       <span className="text-[10px] text-[#A0A0A0] block">Guardrails</span>
-                      <span className="text-sm font-mono font-bold text-emerald-400">100% Passed</span>
+                      <span className="text-sm font-mono font-bold text-emerald-400">
+                        {isRealData ? (guardrailStatus?.blocked ? 'Failed' : guardrailStatus ? 'Passed' : 'Pending') : '100% Passed'}
+                      </span>
                     </div>
                   </div>
                 </div>

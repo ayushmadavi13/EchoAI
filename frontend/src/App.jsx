@@ -6,10 +6,12 @@ import HeroSection from './components/HeroSection';
 import VoiceInterface from './components/VoiceInterface';
 import PipelineVisualizer from './components/PipelineVisualizer';
 import AgentSchedulerVisual from './components/AgentSchedulerVisual';
-
 import Footer from './components/Footer';
+import useRAGQuery from './hooks/useRAGQuery';
 
 export default function App() {
+  const queryState = useRAGQuery();
+
   return (
     <div className="relative min-h-screen bg-transparent text-white selection:bg-white/20 selection:text-white">
       {/* Cinematic Starfield Background & Spaceship */}
@@ -23,10 +25,9 @@ export default function App() {
       <HeroSection />
       
       <main className="max-w-7xl mx-auto relative z-10">
-        <VoiceInterface />
+        <VoiceInterface queryState={queryState} />
         <PipelineVisualizer />
-        <AgentSchedulerVisual />
-
+        <AgentSchedulerVisual queryState={queryState} />
       </main>
 
       <Footer />

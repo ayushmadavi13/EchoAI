@@ -19,6 +19,7 @@ torch>=2.0.0
 # Dataset
 datasets>=2.14.0
 pandas>=2.0.0
+faiss-cpu>=1.7.4
 
 # Environment
 python-dotenv>=1.0.0
