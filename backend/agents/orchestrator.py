@@ -34,8 +34,12 @@ class RagOrchestrator:
             embed_time = (time.perf_counter() - embed_start) * 1000
             
             search_start = time.perf_counter()
-            contexts = search_context(query_vector, top_k=2)
+            contexts = search_context(query_vector, top_k=5)
             search_time = (time.perf_counter() - search_start) * 1000
+            
+            logger.info(f"[DIAGNOSTICS] Query embedding dimension: {len(query_vector)}")
+            logger.info(f"[DIAGNOSTICS] search_context() returned empty list: {len(contexts) == 0}")
+            logger.info(f"[DIAGNOSTICS] Actual top-5 retrieved text snippets:\n{json.dumps(contexts, indent=2, ensure_ascii=False)}")
             
             return contexts, embed_time, search_time
 
@@ -45,6 +49,7 @@ class RagOrchestrator:
                 asyncio.to_thread(fetch_context)
             )
             context_str = "\n".join(contexts)
+            logger.info(f"[DIAGNOSTICS] Exact context string sent to LLM:\n{context_str}")
         except Exception as e:
             logger.error(f"Concurrent execution failed: {e}")
             yield f'data: {json.dumps({"type": "error", "content": "Internal error occurred"})}\n\n'

@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Mic, MicOff, Send, Sparkles, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
-import useRAGQuery from '../hooks/useRAGQuery';
 
-export default function VoiceInterface() {
+export default function VoiceInterface({ queryState }) {
   const { isRecording, audioBlob, recordingTime, startRecording, stopRecording } = useVoiceRecorder();
-  const { runQuery, isLoading, error, transcript, answer, contexts, latencies, guardrailStatus, pipelineSteps } = useRAGQuery();
+  const { runQuery, isLoading, error, transcript, answer, contexts, latencies, guardrailStatus, pipelineSteps } = queryState;
   const [textInput, setTextInput] = useState('');
 
   // Automatically trigger query when audio recording finishes
@@ -190,7 +189,7 @@ export default function VoiceInterface() {
                       pipelineSteps.retrieval === 'success' ? 'bg-[#5BE17C]' : 'bg-white/10'
                     }`}></div>
                   <div className="text-left">
-                    <span className="block text-xs text-[#A0A0A0]">3. Qdrant Search</span>
+                    <span className="block text-xs text-[#A0A0A0]">3. FAISS Search</span>
                     <span className="text-xs font-semibold text-white">
                       {pipelineSteps.retrieval === 'loading' ? 'Searching...' :
                         pipelineSteps.retrieval === 'success' ? 'Completed' : 'Pending'}
